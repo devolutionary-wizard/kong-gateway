@@ -1,0 +1,75 @@
+_format_version: "1.1"
+
+services:
+  - name: json_placeholder
+    url: https://jsonplaceholder.typicode.com/ # Upstream server URL
+
+    routes:
+      - name: posts
+        paths:
+          - /posts
+        methods:
+          - GET
+          - POST
+          - DELETE
+          - PUT
+          - PATCH
+      - name: users
+        paths:
+          - /users
+        methods:
+          - GET
+          - POST
+          - DELETE
+          - PUT
+          - PATCH
+
+    plugins:
+      # Key Authentication plugin
+      - name: key-auth
+        config:
+          hide_credentials: true # Hide these credentials passing to upstream server
+          key_names:
+            - apikey
+
+      # CORS control plugin
+      - name: cors
+        config:
+          origins:
+            - "*" #List of allowed domains
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - X-Auth-Token
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+      # IP Restriction  plugin
+      - name: ip-restriction
+        config:
+          blacklist: # IP address or CIDR range
+            - 168.168.168.168
+
+      # Rate Limiting  plugin
+      - name: rate-limiting
+        config:
+          minute: 10 # 10 Requests per minute
+          policy: local #counters will be stored locally in-memory on the node
+          limit_by: consumer # 10 requests for each consumer
+
+consumers:
+  - username: seanglay
+    keyauth_credentials:
+      - key: 9f63391f-c35f-496b-8ed8-811087f9de44
